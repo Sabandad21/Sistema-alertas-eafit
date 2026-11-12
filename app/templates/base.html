@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Sistema de Alertas{% endblock %} · EAFIT</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="barra">
+    <a class="marca" href="/">Sistema de Alertas <span>salas de cómputo</span></a>
+    {% if usuario %}
+    <nav>
+      {% if usuario.rol in ("guardia", "jefe_seguridad") %}<a href="/alertas" class="{{ 'activa' if activa == 'alertas' }}">Alertas</a>{% endif %}
+      <a href="/historial" class="{{ 'activa' if activa == 'historial' }}">Historial</a>
+      {% if usuario.rol in ("jefe_seguridad", "gestion_activos") %}<a href="/panel" class="{{ 'activa' if activa == 'panel' }}">Panel de cifras</a>{% endif %}
+      <a href="/equipos" class="{{ 'activa' if activa == 'equipos' }}">Equipos</a>
+    </nav>
+    <form method="post" action="/salir" class="salir"><span>{{ usuario.nombre }}</span><button type="submit">Salir</button></form>
+    {% endif %}
+  </header>
+  <main>{% block contenido %}{% endblock %}</main>
+  <script src="/static/common.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}Estado del equipo{% endblock %}
+{% block contenido %}
+<div class="centrado separado">
+  <h1>Estado del equipo</h1>
+  <p class="sub" id="serie" data-serie="{{ numero_serie }}">Equipo {{ numero_serie }}</p>
+  <div id="resultado" class="vacio">Consultando…</div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/aviso.js"></script>{% endblock %}

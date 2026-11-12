@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Historial{% endblock %}
+{% block contenido %}
+<h1>Historial de eventos</h1>
+<p class="sub">Eventos detectados por sala. Cada consulta queda registrada.</p>
+<form id="filtros" class="filtros">
+  <div><label for="sala">Sala</label><select id="sala"><option value="">Todas</option></select></div>
+  <div><label for="desde">Desde</label><input id="desde" type="date"></div>
+  <div><label for="hasta">Hasta</label><input id="hasta" type="date"></div>
+  <div><label for="estado">Estado</label>
+    <select id="estado"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="confirmado">Hurto confirmado</option><option value="descartado">Falsa alarma</option></select></div>
+  <button type="submit">Filtrar</button>
+</form>
+<div id="mensaje"></div>
+<div class="tabla-scroll"><table>
+  <thead><tr><th>Fecha y hora</th><th>Sala</th><th>Evento</th><th>Estado</th><th>Aviso (s)</th><th>Ticket</th><th></th></tr></thead>
+  <tbody id="filas"></tbody>
+</table></div>
+{% endblock %}
+{% block scripts %}<script src="/static/historial.js"></script>{% endblock %}

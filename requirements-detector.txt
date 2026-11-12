@@ -1,0 +1,5 @@
+# Programa que lee el video y envía los eventos (se ejecuta junto a la cámara, no en el servicio web).
+httpx>=0.27
+numpy>=1.26
+onnxruntime>=1.18
+opencv-python-headless>=4.9

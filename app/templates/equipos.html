@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Equipos{% endblock %}
+{% block contenido %}
+<h1>Equipos de las salas</h1>
+<p class="sub">Estado de cada equipo. Los pendientes de reposición tienen un ticket abierto en la mesa de servicio (simulado en este prototipo).</p>
+<div id="mensaje"></div>
+<div class="tabla-scroll"><table>
+  <thead><tr><th>Serie</th><th>Sala</th><th>Estado</th><th>Ticket</th><th>Aviso para estudiantes</th></tr></thead>
+  <tbody id="filas"></tbody>
+</table></div>
+{% endblock %}
+{% block scripts %}<script src="/static/equipos.js"></script>{% endblock %}

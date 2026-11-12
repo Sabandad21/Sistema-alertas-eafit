@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block titulo %}Alertas{% endblock %}
+{% block contenido %}
+<h1>Alertas pendientes</h1>
+<p class="sub">Llegan en tiempo real. Revise cada una y decida si es un hurto o una falsa alarma. <span id="estado-vivo" class="estado-vivo">Conectando…</span></p>
+<div id="lista"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/alertas.js"></script>{% endblock %}

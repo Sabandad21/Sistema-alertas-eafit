@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Evento {{ evento_id }}{% endblock %}
+{% block contenido %}
+<p><a href="/historial">← Volver al historial</a></p>
+<div id="detalle" data-evento="{{ evento_id }}" data-decide="{{ 'si' if puede_decidir else 'no' }}">
+  <p class="vacio">Cargando…</p>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/evento.js"></script>{% endblock %}

@@ -1,0 +1,27 @@
+# Secretos y configuración local
+.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Datos generados por la app (base de datos y capturas de prueba)
+data/
+*.db
+
+# Videos de prueba (pesan mucho; se comparten por otro medio)
+videos/
+
+# Pesos originales de Ultralytics (se usa el .onnx exportado)
+*.pt
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

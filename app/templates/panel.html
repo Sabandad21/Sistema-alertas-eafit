@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titulo %}Panel de cifras{% endblock %}
+{% block contenido %}
+<h1>Panel de cifras de hurtos</h1>
+<p class="sub">Hurtos confirmados por sala y por mes, costo estimado y calidad de las alertas. Con datos de prueba mientras no haya piloto.</p>
+<div id="mensaje"></div>
+<div id="indicadores" class="indicadores"></div>
+<div class="fila">
+  <div class="tarjeta crece"><h2 class="titulo-seccion">Hurtos por sala</h2><div id="por-sala"></div></div>
+  <div class="tarjeta crece"><h2 class="titulo-seccion">Hurtos por mes</h2><div id="por-mes"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/panel.js"></script>{% endblock %}

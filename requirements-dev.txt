@@ -1,0 +1,6 @@
+# Para desarrollar: servicio + detector + pruebas + exportar el modelo a ONNX.
+-r requirements.txt
+-r requirements-detector.txt
+pytest>=8.0
+ultralytics>=8.3   # solo para scripts/exportar_modelo.py
+onnx>=1.16         # solo para scripts/exportar_modelo.py
