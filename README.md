@@ -94,6 +94,14 @@ python -m scripts.medir_latencia --api-url http://localhost:8000 --sala-id 1 --n
 
 Guarda `resultados_latencia.csv` con el detalle de cada evento.
 
+### Probar el detector con una imagen
+
+```bash
+python -m scripts.probar_deteccion RUTA_IMAGEN --hora 2
+```
+
+Detecta personas y equipos en la imagen, dibuja las cajas en `deteccion.jpg` y muestra si la regla de presencia fuera de horario genera un evento (con `--hora 2` sí; con `--hora 10` no). Necesita `requirements-detector.txt` instalado.
+
 ## Pruebas
 
 ```bash
