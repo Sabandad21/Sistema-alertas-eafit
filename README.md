@@ -138,6 +138,10 @@ También se incluye un `Dockerfile` para ejecutar el servicio en cualquier prove
 Ejecute **un solo proceso**: las alertas en vivo se reparten en memoria (suficiente para el piloto; para varios
 procesos habría que usar un servicio de mensajería como Redis o Azure Web PubSub).
 
+
+## Manuel de usuario:
+Manual de usuario: [docs/manual_usuario.md](docs/manual_usuario.md)
+
 ## Limitaciones conocidas
 
 - El detector depende de la calidad del video y no se ha probado con cámaras reales de EAFIT.
