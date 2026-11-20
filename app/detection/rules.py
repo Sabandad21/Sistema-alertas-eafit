@@ -1,12 +1,15 @@
 """Reglas de comportamiento sospechoso sobre las detecciones de un modelo de visión (YOLOv8).
 
 El modelo solo reconoce objetos comunes (persona, portátil, teclado...). NO existe un modelo que
-reconozca "abrir una torre" o "robar RAM". Por eso el comportamiento se define con tres reglas
+reconozca "abrir una torre" o "robar RAM". Por eso el comportamiento se define con dos reglas
 simples sobre lo que el modelo sí ve:
 
   1. equipo_retirado: un portátil que se veía estable desaparece mientras hay una persona en cuadro.
-  2. permanencia_prolongada: una persona permanece junto a un equipo más tiempo del normal.
-  3. presencia_fuera_de_horario: hay una persona en la sala fuera del horario de ocupación.
+  2. presencia_fuera_de_horario: hay una persona en la sala fuera del horario de ocupación.
+
+Estar cerca de un equipo NO es sospechoso: en una sala de cómputo los estudiantes usan los equipos todo el
+día. Por eso no hay una regla de "permanencia junto al equipo" (la tuvo la primera versión del prototipo y se
+retiró). Abrir o destapar un equipo no se puede detectar con un modelo preentrenado; queda como trabajo futuro.
 
 Este módulo no depende de OpenCV ni de la red: recibe detecciones y tiempos, y devuelve eventos.
 Así se puede probar con secuencias sintéticas.
@@ -18,7 +21,6 @@ from typing import Callable
 
 PERSONA = "person"
 PORTATIL = "laptop"
-EQUIPOS = {"laptop", "tv", "keyboard", "mouse"}
 
 BOGOTA = timezone(timedelta(hours=-5))
 
@@ -44,24 +46,12 @@ class ReglasConfig:
     equipo_estable_seg: float = 3.0  # un portátil cuenta como "presente" tras verse así de tiempo
     equipo_ausente_seg: float = 3.0  # y como "retirado" si falta este tiempo
     persona_reciente_seg: float = 6.0  # con una persona vista en los últimos segundos
-    permanencia_seg: float = 8.0
-    margen_cercania: float = 0.15  # la caja de la persona se agranda 15 % para medir cercanía
     fuera_horario_seg: float = 5.0
     hora_inicio_ocupacion: int = 6  # ocupación normal: 06:00 a 22:00
     hora_fin_ocupacion: int = 22
     hora_fija: int | None = None  # para simular una hora en las pruebas y en la demo
     cooldown_seg: float = 60.0  # no repite el mismo tipo de evento antes de este tiempo
     tolerancia_hueco_seg: float = 1.0  # huecos cortos del detector no reinician la cuenta
-
-
-def _agrandar(caja, margen):
-    x1, y1, x2, y2 = caja
-    dx, dy = (x2 - x1) * margen, (y2 - y1) * margen
-    return (x1 - dx, y1 - dy, x2 + dx, y2 + dy)
-
-
-def _se_tocan(a, b) -> bool:
-    return not (a[2] < b[0] or b[2] < a[0] or a[3] < b[1] or b[3] < a[1])
 
 
 def _hora_local(ts: float) -> int:
@@ -78,9 +68,7 @@ class MotorReglas:
         self._conteo_desde = 0.0
         self._ultima_persona = None
         self._menos_desde = None
-        # permanencia y fuera de horario: [inicio, ultimo_visto]
-        self._permanencia: list[float] | None = None
-        self._permanencia_conf: list[float] = []
+        # fuera de horario: [inicio, ultimo_visto]
         self._fuera: list[float] | None = None
         self._fuera_conf: list[float] = []
         self._ultimo_evento: dict[str, float] = defaultdict(lambda: -1e18)
@@ -103,7 +91,6 @@ class MotorReglas:
         c = self.cfg
         validas = [d for d in detecciones if d.confianza >= c.min_confianza]
         personas = [d for d in validas if d.clase == PERSONA]
-        equipos = [d for d in validas if d.clase in EQUIPOS]
         portatiles = [d for d in validas if d.clase == PORTATIL]
         salida: list[EventoDetectado] = []
 
@@ -111,7 +98,6 @@ class MotorReglas:
             self._ultima_persona = ts
 
         self._regla_equipo_retirado(ts, portatiles, salida)
-        self._regla_permanencia(ts, personas, equipos, salida)
         self._regla_fuera_horario(ts, personas, salida)
         return salida
 
@@ -149,19 +135,6 @@ class MotorReglas:
             confs.clear()
             return None, 0.0
         return estado, 0.0
-
-    def _regla_permanencia(self, ts, personas, equipos, salida) -> None:
-        cerca = [
-            (p, e)
-            for p in personas
-            for e in equipos
-            if _se_tocan(_agrandar(p.caja, self.cfg.margen_cercania), e.caja)
-        ]
-        conf = min(1.0, sum(min(p.confianza, e.confianza) for p, e in cerca) / len(cerca)) if cerca else 0.0
-        self._permanencia, dur = self._acumular(self._permanencia, ts, bool(cerca), self._permanencia_conf, conf)
-        if dur >= self.cfg.permanencia_seg:
-            media = sum(self._permanencia_conf) / len(self._permanencia_conf)
-            self._emitir(salida, "permanencia_prolongada", media, ts, f"Persona junto a un equipo durante {dur:.0f} s")
 
     def _regla_fuera_horario(self, ts, personas, salida) -> None:
         activo = bool(personas) and self._fuera_de_horario(ts)

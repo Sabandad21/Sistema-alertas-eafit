@@ -34,8 +34,11 @@ Equipo: Simón Banda, Jaime Cotes y David Duarte. Profesor: Juan Carlos Quintero
 Reglas de comportamiento (`app/detection/rules.py`):
 
 1. **equipo_retirado**: un portátil que se veía estable desaparece mientras hay una persona en cuadro.
-2. **permanencia_prolongada**: una persona permanece junto a un equipo más de 8 s.
-3. **presencia_fuera_de_horario**: hay una persona en la sala entre las 22:00 y las 06:00.
+2. **presencia_fuera_de_horario**: hay una persona en la sala entre las 22:00 y las 06:00.
+
+Estar cerca de un equipo no genera alertas: en una sala de cómputo los estudiantes usan los equipos todo el día. La primera
+versión tenía una regla de "permanencia junto al equipo" y se retiró por eso. Abrir o destapar un equipo no se puede detectar
+con un modelo preentrenado; queda como trabajo futuro (modelo propio o sensor de chasis).
 
 El tiempo del criterio "menos de 30 segundos" se mide entre el instante en que el detector dispara la regla
 (`ocurrido_en`) y el instante en que el servicio termina de avisar (`notificado_en`). Queda guardado en cada evento.
@@ -118,13 +121,15 @@ Ver `.env.example`. Ningún secreto va en el código ni en el repositorio: `SECR
 
 ## Despliegue
 
-Pasos resumidos para Azure App Service (Azure for Students) con base de datos PostgreSQL:
+Pasos resumidos para Azure App Service (Azure for Students). El prototipo se desplegó con SQLite en el almacenamiento
+persistente de la app (`/home/data`); para un uso real se recomienda PostgreSQL (basta cambiar `DATABASE_URL`).
 
-1. Cree un **App Service** Linux con Python 3.12 y una base **Azure Database for PostgreSQL**.
+1. Cree un **App Service** Linux (plan B1) con Python 3.12 y active *Always On*.
 2. En *Configuración > Variables de entorno* defina `APP_ENV=prod`, `APP_BASE_URL`, `DATABASE_URL`, `SECRET_KEY`,
-   `DETECTOR_API_KEY`, `SEED_PASSWORD` y, si lo usa, `TEAMS_WEBHOOK_URL`.
+   `DETECTOR_API_KEY`, `SEED_PASSWORD`, `SCM_DO_BUILD_DURING_DEPLOYMENT=true` y, si lo usa, `TEAMS_WEBHOOK_URL`.
 3. Comando de inicio: `uvicorn app.main:app --host 0.0.0.0 --port 8000`.
-4. Conecte el repositorio de GitHub (*Centro de implementación*) para desplegar en cada cambio a `main`.
+4. Suba el código: ZIP desde el *Centro de implementación* o, si funciona en su suscripción, conecte el repositorio de
+   GitHub para desplegar en cada cambio a `main`.
 5. Cree los datos de prueba una vez: `python -m scripts.seed --historial` desde la consola SSH del App Service.
 6. Compruebe `https://<su-app>.azurewebsites.net/salud`.
 

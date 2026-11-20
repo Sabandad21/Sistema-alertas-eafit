@@ -20,7 +20,7 @@ USUARIOS = [
     ("Jefe de seguridad de prueba", "jefe@prueba.local", "jefe_seguridad"),
     ("Gestión de Activos de prueba", "activos@prueba.local", "gestion_activos"),
 ]
-TIPOS = ["equipo_retirado", "permanencia_prolongada", "presencia_fuera_de_horario"]
+TIPOS = ["equipo_retirado", "presencia_fuera_de_horario"]
 
 
 def sembrar(db: Session, password: str, historial: bool = False) -> bool:

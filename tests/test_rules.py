@@ -38,16 +38,17 @@ def test_parpadeo_corto_del_detector_no_genera_evento():
     assert correr(motor, 6, [PERSONA, PORTATIL_LEJOS], inicio=7) == []
 
 
-def test_permanencia_junto_al_equipo_genera_evento_solo_pasado_el_umbral():
-    motor = MotorReglas(ReglasConfig(hora_fija=12, permanencia_seg=8))
-    assert correr(motor, 7, [PERSONA, PORTATIL]) == []
-    eventos = correr(motor, 3, [PERSONA, PORTATIL], inicio=7)
-    assert [e.tipo for e in eventos] == ["permanencia_prolongada"]
-
-
-def test_persona_lejos_del_equipo_no_cuenta_como_permanencia():
+def test_estudiante_usando_un_equipo_durante_minutos_no_genera_alerta():
+    # Estar junto a un equipo es normal en una sala de cómputo: no es motivo de alerta.
     motor = MotorReglas(ReglasConfig(hora_fija=12))
-    assert correr(motor, 30, [PERSONA, PORTATIL_LEJOS]) == []
+    assert correr(motor, 600, [PERSONA, PORTATIL]) == []
+
+
+def test_portatil_que_se_va_mientras_el_estudiante_sigue_sentado_si_se_detecta():
+    motor = MotorReglas(ReglasConfig(hora_fija=12))
+    correr(motor, 20, [PERSONA, PORTATIL])  # el estudiante usa el portátil con normalidad
+    eventos = correr(motor, 6, [PERSONA], inicio=20)  # el portátil desaparece
+    assert [e.tipo for e in eventos] == ["equipo_retirado"]
 
 
 def test_persona_fuera_de_horario_genera_evento():
